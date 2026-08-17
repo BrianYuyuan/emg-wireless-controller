@@ -49,12 +49,12 @@ MyoWare handles the analog front-end (bandpass filtering, rectification, envelop
 
 ## Iteration History
 
-1. **Arduino Uno + USB serial** — Validated the basic signal chain: MyoWare ENV → analogRead → Serial Plotter. First time seeing my own EMG signal.
-2. **Edge detection + hysteresis** — Added threshold-based triggering in Python. Controlled Flappy Bird (single clench = flap), then Celeste (short clench = jump, sustained clench = walk).
+1. **Arduino Uno + USB serial** — Validated the basic signal chain: MyoWare ENV → analogRead → Serial Plotter. First time seeing my own EMG signal. [emg_serial_basic.ino](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/arduino/emg_serial_basic.ino)
+2. **Edge detection + hysteresis** — Added threshold-based triggering in Python. Controlled Flappy Bird (single clench = flap), then Celeste (short clench = jump, sustained clench = walk). [emg_serial_game.py](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/python/emg_serial_game.py)
 3. **Dual-threshold hysteresis** — Solved the oscillation problem where muscle fatigue during sustained grip caused the signal to hover near the threshold.
 4. **Peak-relative dropout** — Solved the high-frequency re-triggering problem where the ENV envelope couldn't decay fast enough between rapid clenches.
-5. **Arduino Nano ESP32 + BLE** — Migrated from USB serial to Bluetooth. Validated wireless signal transmission with the same Python processing pipeline.
-6. **ESP32-C3 SuperMini + expansion board + LiPo battery** — Fully wireless, battery-powered. Eliminated all physical connection to the computer.
+5. **Arduino Nano ESP32 + BLE** — Migrated from USB serial to Bluetooth. Validated wireless signal transmission with the same Python processing pipeline. 
+6. **ESP32-C3 SuperMini + expansion board + LiPo battery** — Fully wireless, battery-powered. Eliminated all physical connection to the computer. [emg_ble_server.ino](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/arduino/emg_ble_server.ino), [emg_ble_receive.py](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/python/emg_ble_receive.py)
 7. **Facial EMG validation** — Tested jaw clench (temporalis muscle) with wet electrodes. Signal is weaker than forearm (peak ~500 vs ~4000) but clearly detectable with adjusted thresholds.
 
 ## Results
