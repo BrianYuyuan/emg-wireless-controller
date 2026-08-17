@@ -1,6 +1,6 @@
 # EMG Wireless Controller
 
-A wireless EMG wearable that reads muscle signals from the arm or face over Bluetooth and maps them to computer input. Built from scratch for ~$30.
+A wireless EMG wearable that reads muscle signals from the arm or face over Bluetooth and maps them to computer input. Built from scratch for ~$60.
 
 ## Demo
 
