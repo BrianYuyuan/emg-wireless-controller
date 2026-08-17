@@ -12,6 +12,8 @@ MyoWare 2.0 reads surface EMG signals from the arm or face, an ESP32-C3 SuperMin
 
 ## Hardware
 
+![Full setup wireless](images\full_setup_wireless.jpg)
+
 | Component | Model | Purpose | ~Price |
 |-----------|-------|---------|--------|
 | EMG Sensor | MyoWare 2.0 | Amplification + envelope extraction | $43 |
