@@ -4,7 +4,7 @@ A wireless EMG wearable that reads muscle signals from the arm or face over Blue
 
 ## Demo
 
-<video src="images/demo_wireless.mp4" width="600" controls></video>
+https://github.com/user-attachments/assets/9c49c8d5-d93e-4a0d-b162-bd83cf054689
 
 ## What It Does
 
