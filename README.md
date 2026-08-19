@@ -1,3 +1,5 @@
+[English](README.md) | [中文(决策解释)](README.zh.md)
+
 # EMG Wireless Controller
 
 A wireless EMG wearable that reads muscle signals from the arm or face over Bluetooth and maps them to computer input. Built from scratch for ~$60.
@@ -35,17 +37,21 @@ Muscle contraction
 
 MyoWare handles the analog front-end (bandpass filtering, rectification, envelope extraction) in hardware. The ESP32 only needs to sample the clean ENV output and transmit it — no DSP required on the microcontroller.
 
-## Key Technical Decisions
+## Technical Decisions
 
-**Dual-threshold hysteresis** — A single threshold causes rapid toggling when the signal hovers near the boundary (especially during sustained grip as muscle fatigue pulls the signal down). Using separate HIGH (1200) and LOW (500) thresholds creates a dead zone that eliminates false triggers.
+**Soldering & mechanical connection** — I soldered a 3-pin header onto MyoWare for the first time, but the pins were too short for the jumper cables to grip securely. Since desoldering the header would risk damaging the board, I taped the cables to the pins as a temporary fix. Lesson: for wearable builds where connections will be moved and stressed, soldering wires directly to pads is more reliable than pin headers with jumper cables. 
 
-**Peak-relative dropout** — For fast repeated activations, waiting for the signal to drop to an absolute LOW threshold is too slow (the ENV envelope has a hardware time constant). Instead, a new activation is allowed once the signal drops to 60% of the most recent peak, enabling faster re-triggering without waiting for full baseline recovery.
+**Swapped GND and 3.3V** — During testing on the SuperMini, the signal flatlined and MyoWare's green activity LED stayed on regardless of muscle contraction. After checking every GPIO pin and ruling out code issues, I discovered the 3.3V and GND jumper cables were swapped. Fixing the polarity immediately restored normal operation. This was hard to catch because MyoWare still powered on (red LED lit) with reversed polarity — it just couldn't amplify properly. 
 
-**3.3V supply path** — MyoWare supports 3.3–5V input. The ESP32-C3 is a 3.3V system; supplying MyoWare from the 3V3 pin keeps ENV output within the ADC's safe input range. Using 5V would risk damaging the GPIO.
+**3.3V supply instead of 5V** — When migrating from Arduino Uno (5V system) to the ESP32-C3 SuperMini (3.3V system), I switched MyoWare's supply from 5V to 3.3V. MyoWare's operating range is 3.3–5V so it works at either voltage, but the ESP32-C3's ADC pins cannot tolerate inputs above 3.3V. Supplying MyoWare at 3.3V keeps its ENV output within the ADC's safe range. 
 
-**pynput over pyautogui/keyboard** — pyautogui and the keyboard library failed to inject keystrokes into certain games (Celeste, Geometry Dash) due to Windows input-layer restrictions. pynput's lower-level approach worked reliably, confirmed by a prior ELEC220 project using the same library for game control.
+**DFU driver missing on Windows** — The first attempt to flash the Arduino Nano ESP32 failed with "No DFU capable USB device available." The board entered DFU mode (visible in Device Manager with a yellow warning icon), but Windows had no driver for it. Installing WinUSB via Zadig for the "Arduino DFU" device resolved the issue permanently. 
 
-**BLE notify model** — The ESP32 pushes each ADC sample via BLE notifications rather than requiring the computer to poll. Python receives samples asynchronously through bleak callbacks, keeping latency minimal.
+**pynput over pyautogui/keyboard** — My initial Python code used pyautogui and the keyboard library to simulate keystrokes. This worked in text editors but failed silently in games like Celeste — the game received no input. Switching to pynput solved it, likely because pynput injects input at a lower OS level. This was confirmed by a prior course project (ELEC 220) where pynput successfully controlled the same game. 
+
+**Dual-threshold hysteresis** — A single threshold caused rapid false triggering when the EMG signal hovered near the boundary — especially during sustained grip, where muscle fatigue gradually pulls the signal down into the threshold zone. Adding separate HIGH (1200) and LOW (500) thresholds creates a dead zone: the signal must rise above HIGH to trigger, then fall below LOW before it can trigger again. This eliminated oscillation artifacts entirely. 
+
+**Peak-relative dropout** — Even with hysteresis, fast repeated clenches were missed because the ENV envelope couldn't decay to the absolute LOW threshold before the next contraction began. I replaced the fixed LOW threshold with a relative criterion: a new trigger is allowed once the signal drops to 60% of the most recent peak. This adapts automatically to signal amplitude (works for both strong forearm signals and weaker facial signals) and significantly improved responsiveness during rapid inputs, though it still cannot match finger speed.
 
 ## Iteration History
 
@@ -54,8 +60,8 @@ MyoWare handles the analog front-end (bandpass filtering, rectification, envelop
 3. **Dual-threshold hysteresis** — Solved the oscillation problem where muscle fatigue during sustained grip caused the signal to hover near the threshold.
 4. **Peak-relative dropout** — Solved the high-frequency re-triggering problem where the ENV envelope couldn't decay fast enough between rapid clenches.
 5. **Arduino Nano ESP32 + BLE** — Migrated from USB serial to Bluetooth. Validated wireless signal transmission with the same Python processing pipeline. 
-6. **ESP32-C3 SuperMini + expansion board + LiPo battery** — Fully wireless, battery-powered. Eliminated all physical connection to the computer. [emg_ble_server.ino](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/arduino/emg_ble_server.ino), [emg_ble_receive.py](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/python/emg_ble_receive.py)
-7. **Facial EMG validation** — Tested jaw clench (temporalis muscle) with wet electrodes. Signal is weaker than forearm (peak ~500 vs ~4000) but clearly detectable with adjusted thresholds.
+6. **ESP32-C3 SuperMini + expansion board + LiPo battery** — Fully wireless, battery-powered. Eliminated all physical connection to the computer. [emg_ble_server.ino](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/arduino/emg_ble_server.ino)
+7. **Facial EMG validation** — Tested jaw clench (temporalis muscle) with wet electrodes. Signal is weaker than forearm (peak ~500 vs ~4000) but clearly detectable with adjusted thresholds. [emg_ble_receive.py](https://github.com/BrianYuyuan/emg-wireless-controller/blob/main/python/emg_ble_receive.py)
 
 ## Results
 
