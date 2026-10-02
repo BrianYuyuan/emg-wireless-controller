@@ -86,7 +86,7 @@ Baseline ~200–300, clench peaks reaching 3500–4100 (12-bit ADC). No degradat
 
 - **Dry electrode feasibility** — Test conductive foam/rubber electrodes with a headband for stable dry contact on the temporalis, comparing signal quality against wet electrode baseline.
 - **BLE HID (keyboard emulation)** — Move threshold detection onto the ESP32 itself so it acts as a Bluetooth keyboard. Eliminates the need for any computer-side software — phone/tablet/computer just sees a BLE keyboard.
-- **Multi-channel EMG** — Add a second electrode site (e.g., opposite jaw, different facial muscle) to expand the command vocabulary beyond one bit.
+- **Multi-channel + signal weighting** — Add a second electrode site (e.g., opposite jaw, different facial muscle) to expand the command vocabulary beyond one bit. (Reference patent: US20230225659A1)
 - **Headphone integration** — Embed electrodes in headphone cushion foam for a wearable that detects jaw clenching (song control, bruxism detection) without visible electrodes.
 
 ## Built With
