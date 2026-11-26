@@ -8,12 +8,11 @@ DEVICE_NAME = "EMG-Sensor-1"
 CHAR_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
 
 HIGH_THRESHOLD = 1000
-LOW_THRESHOLD = 750
+LOW_THRESHOLD = 500
 BUFFER_SIZE = 500
 
 kb = Controller()
 values = deque([0] * BUFFER_SIZE, maxlen=BUFFER_SIZE)
-was_below = True
 
 peak_value = 0
 was_below = True 
@@ -24,19 +23,21 @@ def on_notify(sender, data):
     value = int.from_bytes(data, byteorder='little')
     values.append(value)
 
-    if not was_below:
-        if value > peak_value:
-            peak_value = value
-        elif value < peak_value * 0.7:
-            was_below = True
+    # if not was_below:
+    #     if value > peak_value:
+    #         peak_value = value
+    #     elif value < peak_value * 0.7:
+    #         was_below = True
 
     if value >= HIGH_THRESHOLD and was_below:
         was_below = False
-        peak_value = value
+        # peak_value = value
         kb.press(Key.space)
         kb.release(Key.space)
         count += 1
         print(f"JUMP! value={value} count={count} ")
+    elif value <= LOW_THRESHOLD and not was_below:
+        was_below = True
 
 async def main():
     print("Scanning...")
